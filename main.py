@@ -6,6 +6,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Input, Flatten, Dense, Activation, Reshape, Softmax
 import numpy as np
 
+
 # %%
 # 教師データ取得
 n = 100000
@@ -17,24 +18,31 @@ y_train = teaching_y[:n]
 x_test = teaching_x[n:]
 y_test = teaching_y[n:]
 
+
 # %%
 # モデル定義
-model: tf.keras.Model = tf.keras.Sequential([
-    Input(shape=(2, 8, 8,)),
-    Flatten(),
-    Dense(128),
-    Activation('relu'),
-    Dense(128),
-    Activation('relu'),
-    Dense(96),
-    Activation('relu'),
-    Dense(64),
-    Activation('relu'),
-    Dense(64),
-    Reshape((8, 8)),
-    Softmax()
-])
-model.summary()
+def make_model():
+    model: tf.keras.Model = tf.keras.Sequential([
+        Input(shape=(2, 8, 8,)),
+        Flatten(),
+        Dense(128),
+        Activation('relu'),
+        Dense(128),
+        Activation('relu'),
+        Dense(128),
+        Activation('relu'),
+        Dense(96),
+        Activation('relu'),
+        Dense(96),
+        Activation('relu'),
+        Dense(64),
+        Activation('relu'),
+        Dense(64),
+        Reshape((8, 8)),
+        Softmax()
+    ])
+    model.summary()
+    return model
 
 
 def metrics(y_true, y_pred):
@@ -53,19 +61,23 @@ def metrics(y_true, y_pred):
     return mean
 
 
-# %%
-# 学習
-# tf.config.run_functions_eagerly(True)
-model.compile(optimizer='Adam', loss='mse', metrics=[metrics])
-model.fit(x_train, y_train, epochs=10000, batch_size=64,
-          validation_data=(x_train, y_train))
-model.save("1208")
+def training(dir_name):
+    model = make_model()
+    model.compile(optimizer='Adam', loss='mse', metrics=[metrics])
+    model.fit(x_train, y_train, epochs=2000, batch_size=128,
+              validation_data=(x_train, y_train),
+              callbacks=[tf.keras.callbacks.TensorBoard(log_dir="tensorboard/" + dir_name)])
+    model.save("saved_model/" + dir_name)
+
+
+def load_model():
+    n = 1000
+    model = tf.keras.models.load_model(
+        "1208", custom_objects={'metrics': metrics})
+    model.summary()
+    res = model.predict(x_test[:n])
+    print(metrics(y_test[:n], res).numpy())
+
 
 # %%
-n = 100
-res = model.predict(x_train[n:n+1])
-ans = y_train[n:n+1]
-print(np.unravel_index(np.argmax(res), res.shape))
-print(np.unravel_index(np.argmax(ans), ans.shape))
-
-# %%
+training("1209")
