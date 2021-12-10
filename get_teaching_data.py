@@ -1,31 +1,38 @@
-
 from typing import AnyStr
 import numpy as np
 from numpy.lib.function_base import extract
 
 
 def get_teaching_data():
-    x = []
-    y = []
-    with open("wthor.txt") as f:
+    each_board_list: list[Board] = []
+    with open("2007-2015-short.txt") as f:
         while True:
             line = f.readline()
             if not line:
                 break
             pre_wthor = Board()
             pre_wthor.init_from_wthor(line[0:2])
-            x.append(pre_wthor.get_x())
-            y.append(pre_wthor.get_y())
+            each_board_list.append(pre_wthor)
             for i in range(0, len(line)-1, 2):
                 if(i == 0):
                     continue
                 wthor = Board()
                 wthor.init_from_wthor(line[i:i+2], pre_wthor)
-                x.append(wthor.get_x())
-                y.append(wthor.get_y())
+                each_board_list.append(wthor)
                 pre_wthor = wthor
         f.close()
-    return np.array(x), np.array(y)
+    player_list = []
+    audience_list = []
+    ans_list = []
+    for board in each_board_list:
+        player_list.extend(board.get_upsized_player())
+        audience_list.extend(board.get_upsized_audience())
+        ans_list.extend(board.get_upsized_ans())
+    return np.array(player_list), np.array(audience_list), np.array(ans_list)
+
+
+def stack_player_audience(player_list, audience_list):
+    return np.stack([player_list, audience_list], 1)
 
 
 class Board:
@@ -71,11 +78,30 @@ class Board:
         print(np.array(self.player))
         print(np.array(self.audience))
 
-    def get_x(self):
-        return np.array([self.player, self.audience])
+    def upsize(self, input):
+        res_array = []
+        res_array.append(np.rot90(input, k=0))
+        #res_array.append(np.rot90(input, k=1))
+        res_array.append(np.rot90(input, k=2))
+        #res_array.append(np.rot90(input, k=3))
+        #res_array.append(np.flipud(np.rot90(input, k=0)))
+        res_array.append(np.flipud(np.rot90(input, k=1)))
+        #res_array.append(np.flipud(np.rot90(input, k=2)))
+        res_array.append(np.flipud(np.rot90(input, k=3)))
+        #res_array.append(np.fliplr(np.rot90(input, k=0)))
+        #res_array.append(np.fliplr(np.rot90(input, k=1)))
+        #res_array.append(np.fliplr(np.rot90(input, k=2)))
+        #res_array.append(np.fliplr(np.rot90(input, k=3)))
+        return res_array
 
-    def get_y(self):
-        return self.ans
+    def get_upsized_player(self):
+        return self.upsize(self.player)
+
+    def get_upsized_audience(self):
+        return self.upsize(self.audience)
+
+    def get_upsized_ans(self):
+        return self.upsize(self.ans)
 
     def reverse(self, row, col):
         done_reverse = False
@@ -104,9 +130,6 @@ class Board:
                 break
             if(do_reverse and len(may_reverse) >= 1):
                 self.post_player[row][col] = 1
-                print(self.post_player, "\n", self.post_audience,
-                      dir, row, col, row_t, col_t)
-                print(may_reverse)
                 done_reverse = True
                 for p in may_reverse:
                     self.post_player[p[0]][p[1]] = 1

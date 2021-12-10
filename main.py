@@ -2,7 +2,7 @@
 # ライブラリインポート
 from tensorflow.python.keras.backend import dtype
 from tensorflow.python.ops.gen_math_ops import arg_max
-from get_teaching_data import get_teaching_data, Board
+from get_teaching_data import get_teaching_data, stack_player_audience, Board
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Flatten, Dense, Activation, Reshape, Softmax
 import numpy as np
@@ -49,8 +49,12 @@ def metrics(y_true, y_pred):
 
 def training(dir_name):
     # 教師データ取得
-    n = 100000
-    (teaching_x, teaching_y) = get_teaching_data()
+    player_list, audience_list, ans_list = get_teaching_data()
+    teaching_x = stack_player_audience(player_list, audience_list).copy()
+    teaching_y = ans_list.copy()
+    #n = int(teaching_x.shape[0] / 4)
+    n = 500000
+    print(n)
 
     x_train = teaching_x[:n]
     y_train = teaching_y[:n]
@@ -87,6 +91,8 @@ def predict(player, audience):
 
 
 # %%
-# training("1209-4")
+training("1210-2")
 
 # %%
+
+# 教師データ取得3.7s
