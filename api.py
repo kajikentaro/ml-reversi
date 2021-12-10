@@ -11,17 +11,17 @@ app = FastAPI()
 
 def fieldLengthNotMatch():
     raise HTTPException(
-        status_code=422, detail="'field' must have 8*8 length.")
+        status_code=421, detail="'field' must have 8*8 length.")
 
 
 def fieldElementNotMatch():
     raise HTTPException(
-        status_code=422, detail="Each element in 'field' must be [0-2] number.")
+        status_code=421, detail="Each element in 'field' must be [0-2] number.")
 
 
 def ColorNotMatch():
     raise HTTPException(
-        status_code=422, detail="'color' must be [1-2] number.")
+        status_code=421, detail="'color' must be [1-2] number.")
 
 
 def convertToMLInput(field, color):
@@ -62,6 +62,17 @@ def read_root(board: Board):
         return {"status": "success", "n": tries, "response": json.dumps(res)}
     else:
         return {"status": "NG"}
+
+
+@app.post("/text")
+def read_test(board: Board):
+    res = read_root(board)
+    ans = None
+    if(res["status"] == "NG"):
+        ans = "NG"
+    else:
+        ans = res["response"]
+    return ans
 
 
 uvicorn.run(app, host="0.0.0.0", port=8000)

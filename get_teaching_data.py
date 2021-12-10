@@ -79,7 +79,8 @@ class Board:
 
     def reverse(self, row, col):
         done_reverse = False
-        self.post_player[row][col] = 1
+        if self.post_player[row][col] + self.post_audience[row][col] >= 1:
+            return False
         dirs = [(0, 1), (1, 0), (-1, 0), (0, -1),
                 (1, 1), (1, -1), (-1, 1), (-1, -1)]
         for dir in dirs:
@@ -102,6 +103,10 @@ class Board:
                     continue
                 break
             if(do_reverse and len(may_reverse) >= 1):
+                self.post_player[row][col] = 1
+                print(self.post_player, "\n", self.post_audience,
+                      dir, row, col, row_t, col_t)
+                print(may_reverse)
                 done_reverse = True
                 for p in may_reverse:
                     self.post_player[p[0]][p[1]] = 1

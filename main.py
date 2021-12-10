@@ -9,18 +9,6 @@ import numpy as np
 
 
 # %%
-# 教師データ取得
-n = 100000
-(teaching_x, teaching_y) = get_teaching_data()
-
-x_train = teaching_x[:n]
-y_train = teaching_y[:n]
-
-x_test = teaching_x[n:]
-y_test = teaching_y[n:]
-
-
-# %%
 # モデル定義
 def make_model():
     model: tf.keras.Model = tf.keras.Sequential([
@@ -60,21 +48,23 @@ def metrics(y_true, y_pred):
 
 
 def training(dir_name):
+    # 教師データ取得
+    n = 100000
+    (teaching_x, teaching_y) = get_teaching_data()
+
+    x_train = teaching_x[:n]
+    y_train = teaching_y[:n]
+
+    x_test = teaching_x[n:]
+    y_test = teaching_y[n:]
+
+    # 訓練開始
     model = make_model()
     model.compile(optimizer='Adam', loss='mse', metrics=[metrics])
     model.fit(x_train, y_train, epochs=2000, batch_size=128,
-              validation_data=(x_train, y_train),
+              validation_data=(x_test, y_test),
               callbacks=[tf.keras.callbacks.TensorBoard(log_dir="tensorboard/" + dir_name)])
     model.save("saved_model/" + dir_name)
-
-
-def load_model():
-    n = 1000
-    model = tf.keras.models.load_model(
-        "1208", custom_objects={'metrics': metrics})
-    model.summary()
-    res = model.predict(x_test[:n])
-    print(metrics(y_test[:n], res).numpy())
 
 
 def predict(player, audience):
