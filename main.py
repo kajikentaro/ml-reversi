@@ -29,10 +29,6 @@ def make_model():
         Activation('relu'),
         Dense(128),
         Activation('relu'),
-        Dense(128),
-        Activation('relu'),
-        Dense(96),
-        Activation('relu'),
         Dense(96),
         Activation('relu'),
         Dense(64),
@@ -45,6 +41,7 @@ def make_model():
     return model
 
 
+# 評価関数定義
 def metrics(y_true, y_pred):
     # (None, 8, 8) to (None, 64)
     reshaped_t = tf.reshape(y_true, (-1, 64))
@@ -79,5 +76,14 @@ def load_model():
     print(metrics(y_test[:n], res).numpy())
 
 
+def predict(input_x):
+    model = tf.keras.models.load_model(
+        "saved_model/1209-4", custom_objects={'metrics': metrics})
+    res = model.predict([input_x])
+    return res
+
+
 # %%
-training("1209")
+# training("1209-4")
+
+# %%
