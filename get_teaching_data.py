@@ -12,13 +12,15 @@ def get_teaching_data():
             line = f.readline()
             if not line:
                 break
-            pre_wthor = Board(line[0:2])
+            pre_wthor = Board()
+            pre_wthor.init_from_wthor(line[0:2])
             x.append(pre_wthor.get_x())
             y.append(pre_wthor.get_y())
             for i in range(0, len(line)-1, 2):
                 if(i == 0):
                     continue
-                wthor = Board(line[i:i+2], pre_wthor)
+                wthor = Board()
+                wthor.init_from_wthor(line[i:i+2], pre_wthor)
                 x.append(wthor.get_x())
                 y.append(wthor.get_y())
                 pre_wthor = wthor
@@ -36,7 +38,13 @@ class Board:
     post_player = None
     post_audience = None
 
-    def __init__(self, new_stone, now_board=None):
+    def init_from_raw(self, player, audience):
+        self.player = player
+        self.audience = audience
+        self.post_player = self.player.copy()
+        self.post_audience = self.audience.copy()
+
+    def init_from_wthor(self, new_stone, now_board=None):
         self.ans = np.zeros((8, 8))
         if now_board:
             self.player = now_board.post_audience

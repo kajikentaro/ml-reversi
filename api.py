@@ -1,15 +1,12 @@
+import json
 from fastapi import FastAPI, HTTPException
 from typing import List
 from pydantic import BaseModel
 from main import predict
+import uvicorn
 import numpy as np
 
 app = FastAPI()
-
-
-class Board(BaseModel):
-    field: List[List[int]]
-    color: int
 
 
 def fieldLengthNotMatch():
@@ -28,8 +25,8 @@ def ColorNotMatch():
 
 
 def convertToMLInput(field, color):
-    player = np.zeros(8, 8)
-    audience = np.zeros(8, 8)
+    player = np.zeros((8, 8))
+    audience = np.zeros((8, 8))
     for i in range(8):
         for j in range(8):
             if field[i][j] == 0:
@@ -39,11 +36,12 @@ def convertToMLInput(field, color):
                 continue
             else:
                 audience[i][j] = 1
-    return np.array([player, audience])
+    return player, audience
 
 
-class User(BaseModel):
-    name: str
+class Board(BaseModel):
+    field: List[List[int]]
+    color: int
 
 
 @app.post("/")
@@ -58,5 +56,12 @@ def read_root(board: Board):
         for i in line:
             if i < 0 or 3 <= i:
                 fieldElementNotMatch()
-    input_x = convertToMLInput(board.field)
-    return {"response": predict(input_x).tolist()}
+    player, audience = convertToMLInput(board.field, board.color)
+    res, tries = predict(player, audience)
+    if res:
+        return {"status": "success", "n": tries, "response": json.dumps(res)}
+    else:
+        return {"status": "NG"}
+
+
+uvicorn.run(app, host="0.0.0.0", port=8000)

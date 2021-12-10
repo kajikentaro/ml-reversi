@@ -1,7 +1,8 @@
 # %%
 # ライブラリインポート
-from enum import auto
-from get_teaching_data import get_teaching_data
+from tensorflow.python.keras.backend import dtype
+from tensorflow.python.ops.gen_math_ops import arg_max
+from get_teaching_data import get_teaching_data, Board
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Flatten, Dense, Activation, Reshape, Softmax
 import numpy as np
@@ -76,11 +77,23 @@ def load_model():
     print(metrics(y_test[:n], res).numpy())
 
 
-def predict(input_x):
+def predict(player, audience):
+    predict_x = np.array([[player, audience]])
     model = tf.keras.models.load_model(
         "saved_model/1209-4", custom_objects={'metrics': metrics})
-    res = model.predict([input_x])
-    return res
+    predict_y = model.predict(predict_x)[0]
+    board = Board()
+    board.init_from_raw(player, audience)
+    res = None
+    for i in range(64):
+        max_arg = np.unravel_index(
+            np.argmax(predict_y), predict_y.shape)
+        max_arg = np.array(max_arg).tolist()
+        if board.reverse(max_arg[0], max_arg[1]):
+            res = max_arg
+            break
+        predict_y[max_arg[0]][max_arg[1]] = 0
+    return res, i
 
 
 # %%
