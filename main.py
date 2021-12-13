@@ -4,7 +4,7 @@ from tensorflow.python.keras.backend import dtype
 from tensorflow.python.ops.gen_math_ops import arg_max
 from get_teaching_data import get_teaching_data, stack_player_audience, Board
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Flatten, Dense, Activation, Reshape, Softmax
+from tensorflow.keras.layers import Input, Flatten, Dense, Reshape, Softmax, Dropout
 import numpy as np
 
 teaching_x = None
@@ -18,8 +18,11 @@ def make_model():
         Input(shape=(2, 8, 8,)),
         Flatten(),
         Dense(128, activation='relu'),
+        Dropout(0.3),
         Dense(128, activation='relu'),
+        Dropout(0.3),
         Dense(128, activation='relu'),
+        Dropout(0.2),
         Dense(96, activation='relu'),
         Dense(64, activation='sigmoid'),
         Reshape((8, 8)),
@@ -66,7 +69,8 @@ def training(dir_name):
 
     # 訓練開始
     model = make_model()
-    model.compile(optimizer='Adam', loss='mse', metrics=[metrics])
+    model.compile(optimizer='Adam', loss='binary_crossentropy',
+                  metrics=[metrics])
     model.fit(x_train, y_train, epochs=200, batch_size=4096,
               validation_data=(x_test, y_test),
               callbacks=[tf.keras.callbacks.TensorBoard(log_dir="tensorboard/" + dir_name)])
