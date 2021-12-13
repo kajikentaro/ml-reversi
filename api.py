@@ -67,6 +67,7 @@ def read_root(board: Board):
 @app.post("/text")
 def read_test(board: Board):
     res = read_root(board)
+    print(res)
     ans = None
     if(res["status"] == "NG"):
         ans = "NG"

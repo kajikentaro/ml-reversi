@@ -5,7 +5,7 @@ from numpy.lib.function_base import extract
 
 def get_teaching_data():
     each_board_list: list[Board] = []
-    with open("2007-2015-short.txt") as f:
+    with open("2007-2015.txt") as f:
         while True:
             line = f.readline()
             if not line:
@@ -81,17 +81,17 @@ class Board:
     def upsize(self, input):
         res_array = []
         res_array.append(np.rot90(input, k=0))
-        #res_array.append(np.rot90(input, k=1))
+        res_array.append(np.rot90(input, k=1))
         res_array.append(np.rot90(input, k=2))
-        #res_array.append(np.rot90(input, k=3))
-        #res_array.append(np.flipud(np.rot90(input, k=0)))
+        res_array.append(np.rot90(input, k=3))
+        res_array.append(np.flipud(np.rot90(input, k=0)))
         res_array.append(np.flipud(np.rot90(input, k=1)))
-        #res_array.append(np.flipud(np.rot90(input, k=2)))
+        res_array.append(np.flipud(np.rot90(input, k=2)))
         res_array.append(np.flipud(np.rot90(input, k=3)))
-        #res_array.append(np.fliplr(np.rot90(input, k=0)))
-        #res_array.append(np.fliplr(np.rot90(input, k=1)))
-        #res_array.append(np.fliplr(np.rot90(input, k=2)))
-        #res_array.append(np.fliplr(np.rot90(input, k=3)))
+        res_array.append(np.fliplr(np.rot90(input, k=0)))
+        res_array.append(np.fliplr(np.rot90(input, k=1)))
+        res_array.append(np.fliplr(np.rot90(input, k=2)))
+        res_array.append(np.fliplr(np.rot90(input, k=3)))
         return res_array
 
     def get_upsized_player(self):
