@@ -78,7 +78,7 @@ def training(dir_name):
 def predict(player, audience):
     predict_x = np.array([[player, audience]])
     model = tf.keras.models.load_model(
-        "saved_model/1213-11", custom_objects={'metrics': metrics})
+        "default_model", custom_objects={'metrics': metrics})
     predict_y = model.predict(predict_x)[0]
     board = Board()
     board.init_from_raw(player, audience)
