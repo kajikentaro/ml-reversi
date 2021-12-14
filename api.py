@@ -44,8 +44,7 @@ class Board(BaseModel):
     color: int
 
 
-@app.post("/")
-def read_root(board: Board):
+def execute(board: Board):
     if board.color != 1 and board.color != 2:
         ColorNotMatch()
     if len(board.field) != 8:
@@ -58,6 +57,12 @@ def read_root(board: Board):
                 fieldElementNotMatch()
     player, audience = convertToMLInput(board.field, board.color)
     res, tries = predict(player, audience)
+    return res, tries
+
+
+@app.post("/")
+def read_root(board: Board):
+    res, tries = execute(board)
     if res:
         return {"status": "success", "n": tries, "response": json.dumps(res)}
     else:
@@ -65,15 +70,13 @@ def read_root(board: Board):
 
 
 @app.post("/text")
-def read_test(board: Board):
-    res = read_root(board)
-    print(res)
-    ans = None
-    if(res["status"] == "NG"):
-        ans = "NG"
+def read_text(board: Board):
+    res, tries = execute(board)
+    print(str(res[0]) + " " + str(res[1]))
+    if res:
+        return str(res[0]) + " " + str(res[1])
     else:
-        ans = res["response"]
-    return ans
+        return "NG"
 
 
 uvicorn.run(app, host="0.0.0.0", port=8000)

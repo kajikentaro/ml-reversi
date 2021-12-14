@@ -18,13 +18,11 @@ def make_model():
         Input(shape=(2, 8, 8,)),
         Flatten(),
         Dense(128, activation='relu'),
-        Dropout(0.3),
         Dense(128, activation='relu'),
-        Dropout(0.3),
         Dense(128, activation='relu'),
-        Dropout(0.2),
+        Dense(128, activation='relu'),
         Dense(96, activation='relu'),
-        Dense(64, activation='sigmoid'),
+        Dense(64),
         Reshape((8, 8)),
         Softmax()
     ])
@@ -71,7 +69,7 @@ def training(dir_name):
     model = make_model()
     model.compile(optimizer='Adam', loss='binary_crossentropy',
                   metrics=[metrics])
-    model.fit(x_train, y_train, epochs=200, batch_size=4096,
+    model.fit(x_train, y_train, epochs=200, batch_size=1048,
               validation_data=(x_test, y_test),
               callbacks=[tf.keras.callbacks.TensorBoard(log_dir="tensorboard/" + dir_name)])
     model.save("saved_model/" + dir_name)
@@ -80,7 +78,7 @@ def training(dir_name):
 def predict(player, audience):
     predict_x = np.array([[player, audience]])
     model = tf.keras.models.load_model(
-        "saved_model/1213-5", custom_objects={'metrics': metrics})
+        "saved_model/1213-11", custom_objects={'metrics': metrics})
     predict_y = model.predict(predict_x)[0]
     board = Board()
     board.init_from_raw(player, audience)
@@ -98,14 +96,19 @@ def predict(player, audience):
 
 # %%
 # fetch_training_data()
-teaching_x = np.load("teaching_x.npy")
-teaching_y = np.load("teaching_y.npy")
+# teaching_x = np.load("teaching_x.npy")
+# teaching_y = np.load("teaching_y.npy")
 
 # %%
-training("1213-6")
+# training("1213-11")
 
 
 # %%
 # model = tf.keras.models.load_model(
 # "saved_model/1210-2", custom_objects={'metrics': metrics})
 # model.summary()
+
+
+# %%
+# np.save("teaching_x_short", teaching_x)
+# np.save("teaching_y_short", teaching_y)
