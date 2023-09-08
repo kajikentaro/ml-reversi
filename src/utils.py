@@ -3,9 +3,10 @@ import numpy as np
 from numpy.lib.function_base import extract
 
 
-def get_teaching_data():
+def get_teaching_data(train_data_name: str):
     each_board_list: list[Board] = []
-    with open("2007-2015-short.txt") as f:
+    
+    with open("train_data/" + train_data_name) as f:
         while True:
             line = f.readline()
             if not line:
