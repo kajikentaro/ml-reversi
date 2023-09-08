@@ -2,8 +2,9 @@ FROM python:3.7
 
 WORKDIR /app
 
-RUN pip install tensorflow==2.11.0 uvicorn==0.16 fastapi==0.70
+RUN pip install tensorflow-cpu==2.11 uvicorn==0.22 fastapi==0.103
 
-COPY ./ ./
+COPY default_model/ default_model/
+COPY src/ src/
 
-CMD ["python", "api.py"]
+CMD ["python", "src/api.py"]
