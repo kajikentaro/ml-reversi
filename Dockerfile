@@ -1,8 +1,9 @@
-FROM python:3.6
+FROM python:3.7
 
 WORKDIR /app
 
+RUN pip install tensorflow==2.11.0 uvicorn==0.16 fastapi==0.70
+
 COPY ./ ./
-RUN pip install tensorflow==2.6.2 uvicorn==0.16 fastapi==0.70
 
 CMD ["python", "api.py"]
