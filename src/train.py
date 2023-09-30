@@ -98,3 +98,10 @@ model = tf.keras.models.load_model(
     "saved_model/" + nowTime, custom_objects={"metrics": metrics}
 )
 model.summary()
+
+# %%
+# 訓練後、モデルをts-liteに変換
+converter = tf.lite.TFLiteConverter.from_saved_model("saved_model/" + nowTime)
+tflite_model = converter.convert()
+with open("default_model.tslite", "wb") as f:
+    f.write(tflite_model)
